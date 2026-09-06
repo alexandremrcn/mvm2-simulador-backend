@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise">
+    <file url="file://$PROJECT_DIR$/mvm2-rest-simulator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-rest-simulator/src/main/java/br/com/mvm2/dto/Mvm2SimulatorRequestDTO.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-rest-simulator/src/main/java/br/com/mvm2/dto/Mvm2SimulatorResponseDTO.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-rest-simulator/src/main/java/br/com/mvm2/mapper/Mvm2SimulatorMapper.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-rest-simulator/src/test/java/br/com/mvm2/Mvm2RestSimulatorTests.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-service-simulator/src/main/java/mvm2services/models/SimulatorInput.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-service-simulator/src/main/java/mvm2services/models/SimulatorResult.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mvm2-service-simulator/src/main/java/mvm2services/services/SimulatorService.java" charset="UTF-8" />
+  </component>
+</project>
