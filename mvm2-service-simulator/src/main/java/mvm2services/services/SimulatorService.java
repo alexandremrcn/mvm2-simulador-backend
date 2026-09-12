@@ -11,12 +11,14 @@ import mvm2services.services.ValorIOF;
 
 import mvm2services.models.SimulatorInput;
 import mvm2services.models.SimulatorResult;
+import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class SimulatorService {
 
     public SimulatorResult simulate(SimulatorInput input) throws Exception {

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Datas {
 
-	/* Atributos de Entrada */
+	/* Atributos de Entrada  - classe Datas */
 	
 	private int diaBaseVcto;
 	private char idDiaUtil;
