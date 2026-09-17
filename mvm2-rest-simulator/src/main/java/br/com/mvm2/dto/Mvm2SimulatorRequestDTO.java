@@ -2,6 +2,8 @@ package br.com.mvm2.dto;
 
 import java.util.List;
 
+
+
 public class Mvm2SimulatorRequestDTO {
 
     private String vlSolicitado;
