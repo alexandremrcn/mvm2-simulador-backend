@@ -6,6 +6,9 @@ public class SimulatorInput {
 
     public String vlSolicitado;
     public String vl1aParcela;
+    public String vlEncargos;
+    public String dtReferencia;
+    public String vlEntrada;
     public String idTaxaFator;
     public String taxa;
     public String periodicidadeTaxa;
@@ -26,4 +29,5 @@ public class SimulatorInput {
     public List<String> idCobrPrinc;
     public List<String> vlParcelaIn;
     public List<String> idTipoParcelaIn;
+    public List<String> dtVencimento;
 }

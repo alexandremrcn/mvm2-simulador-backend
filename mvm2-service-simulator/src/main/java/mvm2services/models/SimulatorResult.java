@@ -15,6 +15,8 @@ public class SimulatorResult {
     public String vlLiberado;
     public String vlFinanciado;
     public String vlIof;
+    public String vlTarifa;
+    public String vlEntrada;
     public int sistemaAmortizacao;
     public char periodicidadeVcto;
     public char tpJuros;

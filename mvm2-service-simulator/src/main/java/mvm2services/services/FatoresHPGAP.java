@@ -20,6 +20,10 @@ public class FatoresHPGAP extends FatoresHP {
 		{
 			proRata = (double) 1 / (double) 12;
 		}
+		else if (periodicidade == 'B')
+		{
+			proRata = (double) 1 / (double) 6;
+		}
 		else if (periodicidade == 'T')
 		{
 			proRata = (double) 1 / (double) 4;

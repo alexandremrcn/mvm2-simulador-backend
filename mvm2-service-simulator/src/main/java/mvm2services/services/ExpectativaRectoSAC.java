@@ -12,40 +12,55 @@ public class ExpectativaRectoSAC extends ExpectativaDeRecebimento {
 		super.vlParcela.clear();
 		super.vlPrincipal.clear();
 		super.vlJuros.clear();
-		
+		double vlPresente = 0.00;
+
 		boolean resultValue = super.validarDadosComuns();
 		
-		if (resultValue == true)
+		if (resultValue)
 			resultValue = validarDadosSAC();
 		
-		if (resultValue == true)
+		if (resultValue)
 		{
 
 			if (super.getIdTaxaFator() == 'T')
 			{
 				super.calcularFatoresHP();
 			}
-			
+
+			if (super.getVlPresente() == 0)
+			{
+				vlPresente = this.calcularVlPresente();
+				super.setVlPresente(vlPresente);
+			}
+
 			this.calcularFluxoSdDevedorSAC();
 		}
 		
 		return resultValue;
 	}
 	
-	boolean validarDadosSAC() 
+	boolean validarDadosSAC()
 	{
 		
-		if (super.getVlPresente() <= 0)
+		if (super.getVlPresente() <= 0 && super.getVl1aParcela() <= 0)
 		{
 			idRetorno = 1;
-			msgRetorno = "Cálculo da Expectativa de Recebimento SAC - Valor Presente n�o Informado ";
+			msgRetorno = "Cálculo da Expectativa de Recebimento SAC - Valor presente e valor da primeira parcelas não informados!";
 			return false;
 		}
 		
 		return true;
 	}
-	
-	
+
+	public double calcularVlPresente() {
+		double vlPresente = 0.00;
+		double vl1Parcela = getVl1aParcela();
+		int qtdeParcelas = getQtdeParcelas();
+		double taxames = super.getFatorTaxaGAP().get(0)-1;
+		vlPresente =  vl1Parcela / (taxames + (1.0 / qtdeParcelas));
+		return vlPresente;
+	}
+
 	public void calcularFluxoSdDevedorSAC()
 	{
 		double vlJuros = 0.00;
@@ -74,4 +89,5 @@ public class ExpectativaRectoSAC extends ExpectativaDeRecebimento {
 			x++;
 		}
 	}
+
 }

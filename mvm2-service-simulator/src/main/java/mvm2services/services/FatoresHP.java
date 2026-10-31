@@ -116,7 +116,8 @@ public class FatoresHP {
 			return false;
 		}
 		
-		if (periodicidade != 'M' && periodicidade != 'A' && periodicidade != 'T' && periodicidade != 'S')
+		if (periodicidade != 'M' && periodicidade != 'B' && periodicidade != 'A'
+				&& periodicidade != 'T' && periodicidade != 'S')
 		{
 			idRetorno = 11;
 			msgRetorno = "C�lculo de fatores - Base da Taxa inv�lida (360 ou 252)";

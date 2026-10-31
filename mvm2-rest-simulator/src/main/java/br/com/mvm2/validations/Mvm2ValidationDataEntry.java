@@ -369,9 +369,11 @@ public class Mvm2ValidationDataEntry {
 				return false;
 			}
 
-			if ( (vlParcelaIn[i].charAt(0) > 0 && idTipoParcelaIn[i].charAt(0) != 'A'
-					&& idTipoParcelaIn[i].charAt(0) != 'B')
-			      || idCobrPrinc[i].length() != 1)
+			if (!idTipoParcelaIn[i].isEmpty()
+					&& (idTipoParcelaIn[i].length() != 1
+					|| (idTipoParcelaIn[i].charAt(0) != 'A'
+					&& idTipoParcelaIn[i].charAt(0) != 'B'
+					&& idTipoParcelaIn[i].charAt(0) != 'N')))
 			{
 				msgRetorno = "Identificaçao da parcela informada, inválido " + idTipoParcelaIn[i];
 				return false;

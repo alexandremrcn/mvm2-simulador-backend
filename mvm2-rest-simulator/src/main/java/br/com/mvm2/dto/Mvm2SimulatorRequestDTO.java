@@ -2,12 +2,12 @@ package br.com.mvm2.dto;
 
 import java.util.List;
 
-
-
 public class Mvm2SimulatorRequestDTO {
 
     private String vlSolicitado;
     private String vl1aParcela;
+    private String vlEncargos;
+    private String dtReferencia;
     private String idTaxaFator;
     private String taxa;
     private String periodicidadeTaxa;
@@ -28,21 +28,27 @@ public class Mvm2SimulatorRequestDTO {
     private List<String> idCobrPrinc;
     private List<String> vlParcelaIn;
     private List<String> idTipoParcelaIn;
+    private List<String> dtVencimento;
+
+    public String getDtReferencia() {
+        return dtReferencia;
+    }
+
 
     public String getVlSolicitado() {
         return vlSolicitado;
-    }
-
-    public void setVlSolicitado(String vlSolicitado) {
-        this.vlSolicitado = vlSolicitado;
     }
 
     public String getVl1aParcela() {
         return vl1aParcela;
     }
 
-    public void setVl1aParcela(String vl1aParcela) {
-        this.vl1aParcela = vl1aParcela;
+    public String getVlEncargos() {
+        return vlEncargos;
+    }
+
+    public void setVlEncargos(String vlEncargos) {
+        this.vlEncargos = vlEncargos;
     }
 
     public String getIdTaxaFator() {
@@ -193,5 +199,13 @@ public class Mvm2SimulatorRequestDTO {
     }
     public void setIdTipoParcelaIn(List<String> idTipoParcelaIn) {
         this.idTipoParcelaIn = idTipoParcelaIn;
+    }
+
+    public List<String> getDtVencimento() {
+        return dtVencimento;
+    }
+
+    public void setDtVencimento(List<String> dtVencimento) {
+        this.dtVencimento = dtVencimento;
     }
 }

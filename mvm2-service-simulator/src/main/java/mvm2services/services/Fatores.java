@@ -94,8 +94,8 @@ public class Fatores {
 	protected boolean validarDadosEntrada() {
 		
 		// Valida��o da taxa
-		
-		if (taxaAno <=0)
+
+		if (taxaAno < 0) // aceita taxa zero
 		{
 			idRetorno = 9;
 			msgRetorno = "C�lculo de fatores - taxa inv�lida";

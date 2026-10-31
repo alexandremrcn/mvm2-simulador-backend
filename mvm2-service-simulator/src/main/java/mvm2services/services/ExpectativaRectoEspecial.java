@@ -93,7 +93,10 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 
 			if (! super.getVlParcelaIn().isEmpty())
 			{
-				if (super.getIdCobrancaPrincipal().get(i).charAt(0) == 'N' && super.getVlParcelaIn().get(i) > 0.00)
+				if ((super.getIdTipoParcelaIn().get(i).isEmpty()
+						|| super.getIdTipoParcelaIn().get(i).charAt(0) != 'N')
+						&& super.getIdCobrancaPrincipal().get(i).charAt(0) == 'N'
+						&& super.getVlParcelaIn().get(i) > 0.00)
 				{
 					DecimalFormat dcValor = new DecimalFormat("00000000.00");
 					idRetorno = 20;
@@ -102,7 +105,10 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 					return false;
 				}
 
-				if (super.getIdTipoParcelaIn().get(i).charAt(0) != 'B' && super.getIdTipoParcelaIn().get(i).charAt(0) != 'A')
+				if (!super.getIdTipoParcelaIn().get(i).isEmpty()
+						&& super.getIdTipoParcelaIn().get(i).charAt(0) != 'B'
+						&& super.getIdTipoParcelaIn().get(i).charAt(0) != 'A'
+						&& super.getIdTipoParcelaIn().get(i).charAt(0) != 'N')
 				{
 					DecimalFormat dcValor = new DecimalFormat("00000000.00");
 					idRetorno = 21;
@@ -112,12 +118,11 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 				}
 			}
 			
-			if (super.getVlParcelaIn().isEmpty())
+			if (super.getVlParcelaIn().isEmpty()
+					|| super.getIdTipoParcelaIn().get(i).isEmpty()
+					|| super.getIdTipoParcelaIn().get(i).charAt(0) == 'N'
+					|| super.getVlParcelaIn().get(i) <= 0.00)
 				existeParcelaZero = true;
-			else if (super.getVlParcelaIn().get(i).equals(null) || super.getVlParcelaIn().get(i).equals(0.00) )
-			{
-				existeParcelaZero = true;
-			}
 		
 		}
 		
@@ -125,13 +130,6 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		{
 			idRetorno = 22;
 			msgRetorno = "Cálculo da Expectativa de Recebimento - Valor Presente não informado";
-			return false;
-		}
-		else
-		if (super.getVlPresente() > 0 && existeParcelaZero == false)
-		{
-			idRetorno = 23;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Deixar uma ou mais parcela(s) sem preenchimento";
 			return false;
 		}
 		
@@ -165,8 +163,8 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		
 		for (int i = 0; i < super.getQtdeParcelas(); i++)
 		{
-			if ( super.getVlParcelaIn().get(i) > 0.00)
-				vlPresenteParcela = vlPresenteParcela + (super.getVlParcelaIn().get(i) / fatorEspecial.get(i)); 
+			if (valorParcelaInformada(i) > 0.00)
+				vlPresenteParcela = vlPresenteParcela + (valorParcelaInformada(i) / fatorEspecial.get(i));
 		}
 		
 		return vlPresenteParcela;
@@ -204,8 +202,8 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		for (int i = 0; i < super.getQtdeParcelas(); i++)
 		{
 			
-			if (super.getVlParcelaIn().get(i) > 0.00)
-				vlParcela = super.getVlParcelaIn().get(i);
+			if (valorParcelaInformada(i) > 0.00)
+				vlParcela = valorParcelaInformada(i);
 			else if (super.getIdCobrancaPrincipal().get(i).charAt(0) == 'N')
 				vlParcela = ((vlSdoRemanescente * super.getFatorTaxaGAP().get(i)) - vlSdoRemanescente);
 			else
@@ -293,10 +291,10 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		for (int i = 0; i < super.getQtdeParcelas(); i++)
 		{
 			
-			if (super.getVlParcelaIn().get(i).equals(null) || super.getVlParcelaIn().get(i).equals(0.00))
+			if (valorParcelaInformada(i) <= 0.00)
 				vlParcelaRef = 0.00;
 			else
-				vlParcelaRef = super.getVlParcelaIn().get(i);
+				vlParcelaRef = valorParcelaInformada(i);
 			
 				
 			if (super.getIdCobrancaPrincipal().get(i).charAt(0) == 'S' && vlParcelaRef == 0.00)
@@ -307,11 +305,20 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 			
 		}
 		
-		if (super.getVlPresente() > vlPresenteParcela)
+		if (super.getVlPresente() > vlPresenteParcela && fatorParcela > 0)
 			vlParcela = (super.getVlPresente() - vlPresenteParcela ) / fatorParcela;
 		else
 			vlParcela = 0.00;
 
 		return vlParcela;
+	}
+
+	private double valorParcelaInformada(int indice) {
+		if (!super.getIdTipoParcelaIn().isEmpty()
+				&& (super.getIdTipoParcelaIn().get(indice).isEmpty()
+				|| super.getIdTipoParcelaIn().get(indice).charAt(0) == 'N')) {
+			return 0.00;
+		}
+		return super.getVlParcelaIn().get(indice);
 	}
 }

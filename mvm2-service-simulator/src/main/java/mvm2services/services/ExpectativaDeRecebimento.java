@@ -91,7 +91,6 @@ public class ExpectativaDeRecebimento {
 		return taxa;
 	}
 
-
 	public char getIdTaxaFator() {
 		return idTaxaFator;
 	}
@@ -266,24 +265,28 @@ public class ExpectativaDeRecebimento {
 		if (vlPresente < 0)
 		{
 			idRetorno = 1;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Valor Presente inválido - "
-			+ vlPresente;
+			msgRetorno = "Valor presente inválido: " + vlPresente + ". Verifique os dados de entrada.";
 			return false;
 		}
-		
+
+		if (vlPresente != 0 && vl1aParcela != 0)
+		{
+			idRetorno = 1;
+			msgRetorno = "Informe apenas um valor entre valor presente e primeira parcela. Os dois não podem ser informados ao mesmo tempo.";
+			return false;
+		}
+
 		if (idTaxaFator != 'T' && idTaxaFator != 'F')
 		{
 			idRetorno = 2;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Indicador da Taxa (T/F) inválida - "
-			+ idTaxaFator;
+			msgRetorno = "Indicador da taxa inválido. Use 'T' para taxa ou 'F' para fator.";
 			return false;
 		}
 		
 		if (qtdeParcelas <= 0)
 		{
 			idRetorno = 3;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Qtde de Parcelas inválida - "
-			+ qtdeParcelas;
+			msgRetorno = "Quantidade de parcelas inválida: " + qtdeParcelas + ". O valor deve ser maior que zero.";
 			return false;
 		}
 		
@@ -292,16 +295,14 @@ public class ExpectativaDeRecebimento {
 			if (baseTaxa != 360 && baseTaxa != 252)
 			{
 				idRetorno = 4;
-				msgRetorno = "Cálculo da Expectativa de Recebimento - Base da Taxa (360/252) inválida - "
-				+ baseTaxa;
+				msgRetorno = "Base da taxa inválida: " + baseTaxa + ". Use 360 ou 252.";
 				return false;
 			}
 
 			if (periodicidadeTaxa != 'A' && periodicidadeTaxa != 'M' && periodicidadeTaxa != 'E')
 			{
 				idRetorno = 5;
-				msgRetorno = "Cálculo da Expectativa de Recebimento - Periodicidade da Taxa (A/M/E) inválida - "
-				+ periodicidadeTaxa;
+				msgRetorno = "Periodicidade da taxa inválida: " + periodicidadeTaxa + ". Use 'A', 'M' ou 'E'.";
 				return false;
 			}
 		}
@@ -312,16 +313,14 @@ public class ExpectativaDeRecebimento {
 				if (fatorTaxa.get(i) <= 0)
 				{
 					idRetorno = 6;
-					msgRetorno = "Cálculo da Expectativa de Recebimento - Fator da Taxa inválida -> "
-					+ fatorTaxa.get(i) + "ref. parcela " + i++;
+					msgRetorno = "Fator da taxa inválido para a parcela " + i + ": " + fatorTaxa.get(i) + ".";
 					return false;
 				}
 
 				if (fatorTaxaGAP.get(i) <= 0)
 				{
 					idRetorno = 6;
-					msgRetorno = "Cálculo da Expectativa de Recebimento - Fator GAP da Taxa inválida -> "
-					+ fatorTaxaGAP.get(i) + "ref. parcela " + i++;
+					msgRetorno = "Fator GAP da taxa inválido para a parcela " + i + ": " + fatorTaxaGAP.get(i) + ".";
 					return false;
 				}
 
@@ -331,8 +330,7 @@ public class ExpectativaDeRecebimento {
 		if (tipoJuros != 'S' && tipoJuros != 'P')
 		{
 			idRetorno = 7;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Tipo de Juros (S/P) inválido - "
-			+ tipoJuros;
+			msgRetorno = "Tipo de juros inválido: " + tipoJuros + ". Use 'S' ou 'P'.";
 			return false;
 		}
 		
@@ -340,8 +338,7 @@ public class ExpectativaDeRecebimento {
 			cdSistemaAmortizacao != 4)
 		{
 			idRetorno = 8;
-			msgRetorno = "Cálculo da Expectativa de Recebimento - Sistema de Amortização (1/2/3/4) inválido - "
-			+ cdSistemaAmortizacao;
+			msgRetorno = "Sistema de amortização inválido: " + cdSistemaAmortizacao + ". Use 1, 2, 3 ou 4.";
 			return false;
 		}
 		
@@ -352,19 +349,24 @@ public class ExpectativaDeRecebimento {
 			if (qtdeDiasVcto.get(i) <= 0)
 			{
 				idRetorno = 9;
-				msgRetorno = "Cálculo da Expectativa de Recebimento - Dias até Vcto inválido - "
-				+ qtdeDiasVcto.get(i) + " ref. parcela " + i++;
+				msgRetorno = "Dias até o vencimento inválidos na parcela " + i + ": " + qtdeDiasVcto.get(i) + ".";
 				return false;
 			}
 			if (qtdeDiasVcto.get(i) <= qtdeDiasVctoAnt )
 			{
 				idRetorno = 10;
-				msgRetorno = "Cálculo da Expectativa de Recebimento - Dias até Vcto inválido - "
-				+ qtdeDiasVcto.get(i) + " ref. parcela " + i++;
+				msgRetorno = "A sequência de vencimentos está inconsistente na parcela " + i + ": " + qtdeDiasVcto.get(i) + ".";
 				return false;
 			}
 			qtdeDiasVctoAnt = qtdeDiasVcto.get(i);
 			
+		}
+
+		if (taxa <= 0) // não aceita taxa zero, pois o cálculo de fatores não é necessário
+		{
+			idRetorno = 11;
+			msgRetorno = "Taxa inválida: " + taxa + ". A taxa deve ser maior que zero.";
+			return false;
 		}
 
 		return true;

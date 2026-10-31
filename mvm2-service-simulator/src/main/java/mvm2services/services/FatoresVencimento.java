@@ -18,8 +18,7 @@ public class FatoresVencimento extends Fatores {
 
 			for (int x = 0; x < qtdeParcelas; x++)
 			{
-				// Fator do per�odo at� o vencimento
-				fatorTaxa.add(Math.pow(fatorTaxaDia, qtdeDias.get(x)));  
+				fatorTaxa.add(Math.pow(fatorTaxaDia, qtdeDias.get(x)));
 			}
 			return fatorTaxa;
 		}

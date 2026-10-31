@@ -4,8 +4,11 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Datas {
 
@@ -148,6 +151,19 @@ public class Datas {
 		return resultValue;
 	}
 
+	private boolean dataFormatoValido(String data)
+	{
+		if (data == null || data.isBlank()) {
+			return false;
+		}
+		try {
+			LocalDate.parse(data, DateTimeFormatter.BASIC_ISO_DATE);
+			return true;
+		} catch (DateTimeParseException ex) {
+			return false;
+		}
+	}
+
 	public int getIdRetorno() {
 		return idRetorno;
 	}
@@ -216,10 +232,11 @@ public class Datas {
 			
 		}
 		
-		if (periodicidadeVcto != 'M'  && periodicidadeVcto != 'A' && periodicidadeVcto != 'E' && periodicidadeVcto != 'D')
+		if (periodicidadeVcto != 'M' && periodicidadeVcto != 'B' && periodicidadeVcto != 'T'
+				&& periodicidadeVcto != 'A' && periodicidadeVcto != 'E' && periodicidadeVcto != 'D')
 		{
 			idRetorno = 17;
-			msgRetorno = "Validação de Datas - Periodicidade de Vencimento inválida (M/A/E/D) -> "
+			msgRetorno = "Validação de Datas - Periodicidade de Vencimento inválida (M/B/T/A/E/D) -> "
 						+ periodicidadeVcto; 
 			return false;
 		}
@@ -239,7 +256,7 @@ public class Datas {
 			return false;
 		}
 
-		if (qtdeParcelas > 1000 && periodicidadeVcto == 'M')
+		if (qtdeParcelas > 1000 && (periodicidadeVcto == 'M' || periodicidadeVcto == 'B' || periodicidadeVcto == 'T'))
 		{
 			idRetorno = 19;
 			msgRetorno = "Quantidade de parcelas maior do que o limite parametrizado ";
@@ -338,9 +355,10 @@ public class Datas {
 			if (x == 0)
 			{
 				resultado = this.validarDtVtc1ap(dtVencimento[x]);
-				if (!resultado)
+				if (!resultado) {
 					resultValue = false;
 					return false;
+				}
 			}
 			else
 			{
@@ -385,9 +403,13 @@ public class Datas {
 	
 	public String calcularDtVtc1ap()
 	{
-		if (diaBaseVcto == 0) {
-            diaBaseVcto = Integer.parseInt(dtReferencia.substring(7, 2));
-        }
+		if (diaBaseVcto == 0 && dtReferencia != null && dtReferencia.length() >= 8) {
+			LocalDate localDtReferencia = LocalDate.of(
+					Integer.parseInt(dtReferencia.substring(0, 4)),
+					Integer.parseInt(dtReferencia.substring(4, 6)),
+					Integer.parseInt(dtReferencia.substring(6, 8)));
+			diaBaseVcto = localDtReferencia.getDayOfMonth();
+		}
 		
 		resultValue = validarDadosEntrada();
 		
@@ -436,9 +458,9 @@ public class Datas {
 								Integer.parseInt(dtVct1Ap.substring(6,8)));
 			
 			   
-			if (periodicidadeVcto == 'M') // Periodicidade Mensal
+			if (periodicidadeVcto == 'M' || periodicidadeVcto == 'B' || periodicidadeVcto == 'T')
 			{
-				localDateVct1ap = localDateVct1ap.plusMonths(1);
+				localDateVct1ap = localDateVct1ap.plusMonths(mesesPorPeriodicidade());
 
 				// Verifica se o dia base de vencimento é menor do que o dia da data limite
 
@@ -762,9 +784,10 @@ public class Datas {
 					Integer.parseInt(dtPrxVcto.substring(6,8)));
 			
 
-			if (this.getPeriodicidadeVcto() == 'M')
+			if (this.getPeriodicidadeVcto() == 'M' || this.getPeriodicidadeVcto() == 'B'
+					|| this.getPeriodicidadeVcto() == 'T')
 			{
-				localdtPrxVcto = localdtPrxVcto.plusMonths(1);
+				localdtPrxVcto = localdtPrxVcto.plusMonths(mesesPorPeriodicidade());
 			}
 			else if (this.getPeriodicidadeVcto() == 'A')
 			{
@@ -842,6 +865,12 @@ public class Datas {
 		if (this.getDtVct1ap() == null)
 		{
 			dtVct1ap = this.calcularDtVtc1ap();
+		} else if (idDiaUtil == 'S' && dataFormatoValido(dtVct1ap)) {
+			LocalDate dataVencimento = LocalDate.parse(dtVct1ap, DateTimeFormatter.BASIC_ISO_DATE);
+			while (!verificaDiaUtil(dtVct1ap)) {
+				dataVencimento = dataVencimento.plusDays(1);
+				dtVct1ap = dataVencimento.format(DateTimeFormatter.BASIC_ISO_DATE);
+			}
 		}
 		
 		resultValue = this.validarDadosEntrada();
@@ -871,6 +900,89 @@ public class Datas {
 		}
 		
 		return resultValue;
+	}
+
+	public boolean calcularLinhaDoTempo(List<String> vencimentosInformados)
+	{
+		if (vencimentosInformados == null || vencimentosInformados.isEmpty()) {
+			return calcularLinhaDoTempo();
+		}
+
+		dtVencimento.clear();
+		qtdeDiasCorridos.clear();
+		qtdeDiasUteis.clear();
+
+		if (vencimentosInformados.size() != qtdeParcelas) {
+			idRetorno = 21;
+			msgRetorno = "Quantidade de datas de vencimento diferente da quantidade de parcelas";
+			resultValue = false;
+			return false;
+		}
+		if (vencimentosInformados.get(0) == null) {
+			idRetorno = 21;
+			msgRetorno = "Data do primeiro vencimento não informada";
+			resultValue = false;
+			return false;
+		}
+
+		resultValue = validarDadosEntrada();
+		if (!resultValue || !validarDtVtc1ap(vencimentosInformados.get(0))) {
+			return false;
+		}
+
+		LocalDate dataAnterior = null;
+		for (int i = 0; i < vencimentosInformados.size(); i++) {
+			String vencimento = vencimentosInformados.get(i);
+			if (vencimento == null) {
+				idRetorno = 21;
+				msgRetorno = "Data de vencimento não informada - parcela " + (i + 1);
+				resultValue = false;
+				return false;
+			}
+			LocalDate dataVencimento;
+			try {
+				dataVencimento = LocalDate.parse(vencimento, DateTimeFormatter.BASIC_ISO_DATE);
+			} catch (DateTimeParseException ex) {
+				idRetorno = 21;
+				msgRetorno = "Data de vencimento inválida - formato (AAAAMMDD) - " + vencimento;
+				resultValue = false;
+				return false;
+			}
+
+			if (dataAnterior != null && !dataVencimento.isAfter(dataAnterior)) {
+				idRetorno = 22;
+				msgRetorno = "Fluxo de vencimentos não está em ordem crescente - parcela " + (i + 1);
+				resultValue = false;
+				return false;
+			}
+
+			if (idDiaUtil == 'S' && !verificaDiaUtil(vencimento)) {
+				idRetorno = 22;
+				msgRetorno = "Vencimento informado não é dia útil - parcela " + (i + 1);
+				resultValue = false;
+				return false;
+			}
+
+			dtVencimento.add(vencimento);
+			qtdeDiasCorridos.add(calcularDiasCorridos(dtReferencia, vencimento));
+			qtdeDiasUteis.add(calcularDiasUteis(dtReferencia, vencimento));
+			dataAnterior = dataVencimento;
+		}
+
+		dtVct1ap = vencimentosInformados.get(0);
+		resultValue = true;
+		return true;
+	}
+
+	private int mesesPorPeriodicidade()
+	{
+		if (periodicidadeVcto == 'B') {
+			return 2;
+		}
+		if (periodicidadeVcto == 'T') {
+			return 3;
+		}
+		return 1;
 	}
 	
 }

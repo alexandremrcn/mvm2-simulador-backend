@@ -12,6 +12,8 @@ public class Mvm2SimulatorMapper {
 
         input.vlSolicitado = dto.getVlSolicitado();
         input.vl1aParcela = dto.getVl1aParcela();
+        input.vlEncargos = dto.getVlEncargos();
+        input.dtReferencia = dto.getDtReferencia();
         input.idTaxaFator = dto.getIdTaxaFator();
         input.taxa = dto.getTaxa();
         input.periodicidadeTaxa = dto.getPeriodicidadeTaxa();
@@ -31,6 +33,8 @@ public class Mvm2SimulatorMapper {
         input.idCobrJuros = dto.getIdCobrJuros();
         input.idCobrPrinc = dto.getIdCobrPrinc();
         input.vlParcelaIn = dto.getVlParcelaIn();
+        input.idTipoParcelaIn = dto.getIdTipoParcelaIn();
+        input.dtVencimento = dto.getDtVencimento();
 
         return input;
     }

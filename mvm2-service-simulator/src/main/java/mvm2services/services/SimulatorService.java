@@ -1,30 +1,28 @@
 package mvm2services.services;
 
-import mvm2services.services.Datas;
-import mvm2services.services.ExpectativaDeRecebimento;
-import mvm2services.services.ExpectativaRectoEspecial;
-import mvm2services.services.ExpectativaRectoPRICE;
-import mvm2services.services.ExpectativaRectoPRICEHP;
-import mvm2services.services.ExpectativaRectoSAC;
-import mvm2services.services.NumberConverter;
-import mvm2services.services.ValorIOF;
-
 import mvm2services.models.SimulatorInput;
 import mvm2services.models.SimulatorResult;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class SimulatorService {
 
-    public SimulatorResult simulate(SimulatorInput input) throws Exception {
+    public SimulatorResult simulate(SimulatorInput input) {
 
         double dbVlSolicitado = NumberConverter.convertToDouble(input.vlSolicitado);
+        double dbVlEncargos = NumberConverter.convertToDouble(input.vlEncargos);
         double vlPresente = dbVlSolicitado;
+        double dbVl1aParcela = NumberConverter.convertToDouble(input.vl1aParcela);
+
+        if (dbVl1aParcela  == 0) {
+            vlPresente += dbVlEncargos;
+        }
 
         ArrayList<Double> fatorTaxa = new ArrayList<>();
         ArrayList<Double> fatorTaxaGAP = new ArrayList<>();
@@ -36,13 +34,19 @@ public class SimulatorService {
                 dbVlParcelaIn.add(NumberConverter.convertToDouble(v));
             }
         }
+        ArrayList<String> idTipoParcelaIn = input.idTipoParcelaIn == null
+                ? new ArrayList<>()
+                : new ArrayList<>(input.idTipoParcelaIn);
 
-        ArrayList<String> strIdCobrJuros = new ArrayList<>(input.idCobrJuros);
-        ArrayList<String> strIdCobrPrincipal = new ArrayList<>(input.idCobrPrinc);
+        ArrayList<String> strIdCobrJuros = input.idCobrJuros == null ? new ArrayList<>() : new ArrayList<>(input.idCobrJuros);
+        ArrayList<String> strIdCobrPrincipal = input.idCobrPrinc == null ? new ArrayList<>() : new ArrayList<>(input.idCobrPrinc);
 
         Datas datas = new Datas();
 
-        LocalDate localDate = LocalDate.now();
+        String dtReferencia = input.dtReferencia == null ? "" : input.dtReferencia.trim();
+        LocalDate localDate = dtReferencia.isEmpty()
+                ? LocalDate.now()
+                : LocalDate.parse(dtReferencia, DateTimeFormatter.BASIC_ISO_DATE);
         String dtCorrente = String.format("%04d", localDate.getYear()) +
                 String.format("%02d", localDate.getMonthValue()) +
                 String.format("%02d", localDate.getDayOfMonth());
@@ -60,9 +64,9 @@ public class SimulatorService {
         datas.setQtdeDiasCarencia(Integer.parseInt(input.qtdeDiasCarencia));
         datas.setQtdeParcelas(Integer.parseInt(input.qtdeParcelas));
 
-        boolean validaDatas = datas.calcularLinhaDoTempo();
+        boolean validaDatas = datas.calcularLinhaDoTempo(input.dtVencimento);
         if (!validaDatas) {
-            throw new RuntimeException(datas.getMsgRetorno());
+            throw new IllegalArgumentException("Erro ao validar o fluxo de datas: " + datas.getMsgRetorno());
         }
 
         ArrayList<Integer> qtdeDiasVcto = datas.getQtdeDiasCorridos();
@@ -94,6 +98,7 @@ public class SimulatorService {
         expRecebimento.setTipoJuros(input.tipoJuros.charAt(0));
         expRecebimento.setVl1aParcela(NumberConverter.convertToDouble(input.vl1aParcela));
         expRecebimento.setVlParcelaIn(dbVlParcelaIn);
+        expRecebimento.setIdTipoParcelaIn(idTipoParcelaIn);
         expRecebimento.setVlPresente(vlPresente);
         expRecebimento.setIdCobrancaJuros(strIdCobrJuros);
         expRecebimento.setIdCobrancaPrincipal(strIdCobrPrincipal);
@@ -116,7 +121,7 @@ public class SimulatorService {
             vlIOF = valorIOF.calcularIOF();
 
             if (valorIOF.getIdRetorno() != 0) {
-                throw new RuntimeException(valorIOF.getMsgRetorno());
+                throw new IllegalArgumentException("Erro ao calcular o IOF: " + valorIOF.getMsgRetorno());
             }
 
             if ((dbVlSolicitado == 0.00) || (valorIOF.getTipoNegociacaoIOF() != '1')) {
@@ -125,7 +130,7 @@ public class SimulatorService {
             } else {
                 vlPresente = expRecebimento.getVlPresente() + vlIOF;
                 expRecebimento.setVlPresente(vlPresente);
-                calcularFluxo = expRecebimento.calcularFluxo();
+                expRecebimento.calcularFluxo();
             }
         }
 
@@ -141,7 +146,6 @@ public class SimulatorService {
         result.baseTaxaJuros = expRecebimento.getBaseTaxa();
         result.qtdeParcelas = expRecebimento.getQtdeParcelas();
         result.vlFinanciado = df.format(expRecebimento.getVlPresente());
-        result.vlLiberado = df.format(dbVlSolicitado);
         result.vlIof = df.format(vlIOF);
         result.sistemaAmortizacao = expRecebimento.getCdSistemaAmortizacao();
         result.periodicidadeVcto = expRecebimento.getPeriodicidadeVcto();

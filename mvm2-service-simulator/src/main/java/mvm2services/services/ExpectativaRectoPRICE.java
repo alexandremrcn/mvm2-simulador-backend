@@ -254,7 +254,7 @@ public class ExpectativaRectoPRICE extends ExpectativaDeRecebimento {
 			vlSdoRemanescente = Math.abs(vlSdoRemanescente);
 
 			
-			if (vlJuros <= 0.00 || vlPrincipal < 0.00)
+			if (vlJuros < 0.00 || vlPrincipal < 0.00)
 			{
 				idRetorno = 24;
 				msgRetorno = "Valor da Parcela menor do que o Valor dos Juros, favor alterar - Parcela "

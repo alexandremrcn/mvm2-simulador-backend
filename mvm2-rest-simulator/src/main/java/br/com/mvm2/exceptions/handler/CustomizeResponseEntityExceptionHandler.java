@@ -15,29 +15,36 @@ import br.com.mvm2.exceptions.UnsupportedMathOperationException;
 
 @ControllerAdvice
 @RestController
-class CustomizeResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
+class CustomizeResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
-	public final ResponseEntity<ExceptionResponse> handleAllExceptions(
-			Exception ex, WebRequest request) {
-		
+	public final ResponseEntity<ExceptionResponse> handleAllExceptions(Exception ex, WebRequest request) {
 		ExceptionResponse exceptionResponse = new ExceptionResponse(
 				new Date(),
-				ex.getMessage(),
-				request.getDescription(false));
-		
+				"Erro interno do servidor. Consulte o log para mais detalhes.",
+				ex.getMessage() + " - " + request.getDescription(false));
+
 		return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	@ExceptionHandler(UnsupportedMathOperationException.class)
-	public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(
-			Exception ex, WebRequest request) {
-		
+	public final ResponseEntity<ExceptionResponse> handleBadRequestExceptions(UnsupportedMathOperationException ex,
+			WebRequest request) {
 		ExceptionResponse exceptionResponse = new ExceptionResponse(
 				new Date(),
 				ex.getMessage(),
 				request.getDescription(false));
-		
-		return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler({IllegalArgumentException.class, NumberFormatException.class})
+	public final ResponseEntity<ExceptionResponse> handleValidationExceptions(RuntimeException ex, WebRequest request) {
+		ExceptionResponse exceptionResponse = new ExceptionResponse(
+				new Date(),
+				"Dados inválidos para a operação solicitada.",
+				ex.getMessage() + " - " + request.getDescription(false));
+
+		return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
 	}
 }
