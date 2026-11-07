@@ -547,20 +547,7 @@ public class Datas {
 			
 			if (idDiaUtil == 'S')
 			{
-				boolean resDiaUtil = false;
-				
-				while (!resDiaUtil)
-				{
-					resDiaUtil = verificaDiaUtil(dtVct1Ap);
-
-					if (!resDiaUtil)
-					{
-						localDateVct1ap = localDateVct1ap.plusDays(1);
-						dtVct1Ap = 	String.format("%04d",localDateVct1ap.getYear()) + 
-								String.format("%02d",localDateVct1ap.getMonthValue()) +
-								String.format("%02d",localDateVct1ap.getDayOfMonth());
-					}
-				}
+				dtVct1Ap = ajustarParaDiaUtil(localDateVct1ap);
 			}
 
 			resultValue = true;
@@ -573,6 +560,30 @@ public class Datas {
 	}
 	
 	
+	/*
+	 * Avança para o próximo dia útil; se ultrapassar o último dia do mês,
+	 * retorna o último dia útil do mês da data original.
+	 */
+	private String ajustarParaDiaUtil(LocalDate data)
+	{
+		LocalDate candidata = data;
+		while (!verificaDiaUtil(candidata.format(DateTimeFormatter.BASIC_ISO_DATE)))
+		{
+			candidata = candidata.plusDays(1);
+			if (candidata.getMonthValue() != data.getMonthValue() && periodicidadeVcto != 'D')
+			{
+				candidata = data.withDayOfMonth(data.lengthOfMonth());
+				while (candidata.getDayOfMonth() > 1
+						&& !verificaDiaUtil(candidata.format(DateTimeFormatter.BASIC_ISO_DATE)))
+				{
+					candidata = candidata.minusDays(1);
+				}
+				break;
+			}
+		}
+		return candidata.format(DateTimeFormatter.BASIC_ISO_DATE);
+	}
+
 	public boolean verificaDiaUtil(String dtUtil)
 	{
 	
@@ -831,19 +842,7 @@ public class Datas {
 
 			if (idDiaUtil == 'S')
 			{
-				boolean resDiaUtil = false;
-				while (!resDiaUtil)
-				{
-					resDiaUtil = verificaDiaUtil(dtPrxVcto);
-
-					if (!resDiaUtil)
-					{
-						localdtPrxVcto = localdtPrxVcto.plusDays(1);
-						dtPrxVcto = 	String.format("%04d",localdtPrxVcto.getYear()) + 
-								String.format("%02d",localdtPrxVcto.getMonthValue()) +
-								String.format("%02d",localdtPrxVcto.getDayOfMonth());
-					}
-				}
+				dtPrxVcto = ajustarParaDiaUtil(localdtPrxVcto);
 			}
 		}	
 
@@ -866,11 +865,7 @@ public class Datas {
 		{
 			dtVct1ap = this.calcularDtVtc1ap();
 		} else if (idDiaUtil == 'S' && dataFormatoValido(dtVct1ap)) {
-			LocalDate dataVencimento = LocalDate.parse(dtVct1ap, DateTimeFormatter.BASIC_ISO_DATE);
-			while (!verificaDiaUtil(dtVct1ap)) {
-				dataVencimento = dataVencimento.plusDays(1);
-				dtVct1ap = dataVencimento.format(DateTimeFormatter.BASIC_ISO_DATE);
-			}
+			dtVct1ap = ajustarParaDiaUtil(LocalDate.parse(dtVct1ap, DateTimeFormatter.BASIC_ISO_DATE));
 		}
 		
 		resultValue = this.validarDadosEntrada();
