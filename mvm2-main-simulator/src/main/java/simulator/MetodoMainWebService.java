@@ -27,10 +27,10 @@ public class MetodoMainWebService {
 		char periodicidadeVcto = 'M'; // periodicidade de vencimento das parcelas (M - mensal, D - diária, A - anual)
 		char idDiaUtil = 'N'; // informa se a parcela vence em dia útil (S/N)
 		char tipoJuros = 'S'; // Tipo de Juros (S = Juros sobre Saldo Devedor, P = Juros sobre Parcela)
-		int qtdeParcelas = 100; // quantidades de parcelas da operação
+		int qtdeParcelas = 12; // quantidades de parcelas da operação
 		int qtdeDiasCarencia = 0; // quantidade de dias de carencia;
-		int diaBaseVencimento = 31; // dia do vencimento das parcelas;
-		int cdSistemaAmortizacao = 1; // Sistema de Amortizaçãoo (1 = Price HP, 2 = Price, 3 = SAC, 4 - Especial)
+		int diaBaseVencimento = 0; // dia do vencimento das parcelas;
+		int cdSistemaAmortizacao = 4; // Sistema de Amortizaçãoo (1 = Price HP, 2 = Price, 3 = SAC, 4 - Especial)
 
 		/* Se Sistema de Amortização = 4 (Especial, obrigatório informar as parcelas e identificadores de
 		   cobrança de juros e correção monetária
@@ -47,12 +47,12 @@ public class MetodoMainWebService {
 
 		for (int i = 0; i < qtdeParcelas; i++) {
 			idCobrJuros.add("S");
-			idCobrPrincipal.add("S");
 
-			if (i == 15) {
-				vlParcelaIn.set(i, 20000.00);
-				idTipoParcelaIn.set(i, "A");
-			}
+			if (i <= 5)
+				idCobrPrincipal.add("N");
+			else
+				idCobrPrincipal.add("S");
+
 		}
 
 		// Dados calculados
