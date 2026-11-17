@@ -260,12 +260,12 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		for (int x = 0; x < super.getQtdeParcelas(); x++)
 		{
 			
-			if (x == 0)
-			{
-				fatorBase = 1;
-				fatorEspecial.add(super.getFatorTaxa().get(x));
-			}
-			else if (super.getIdCobrancaPrincipal().get(x).charAt(0) == 'N')
+//			if (x == 0)
+//			{
+//				fatorBase = 1;
+//				fatorEspecial.add(super.getFatorTaxa().get(x));
+//			}
+			if (super.getIdCobrancaPrincipal().get(x).charAt(0) == 'N')
 			{
 				fatorBase = super.getFatorTaxa().get(x);
 				fatorEspecial.add(super.getFatorTaxa().get(x));
