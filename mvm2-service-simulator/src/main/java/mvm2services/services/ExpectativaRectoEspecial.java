@@ -255,7 +255,7 @@ public class ExpectativaRectoEspecial extends ExpectativaDeRecebimento {
 		
 		ArrayList<Double> fatorEspecial = new ArrayList<Double>();
 		
-		double fatorBase = 0;
+		double fatorBase = 1;
 
 		for (int x = 0; x < super.getQtdeParcelas(); x++)
 		{
